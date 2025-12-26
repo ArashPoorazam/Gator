@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const configFilePath = "/bootdev/Gator/.gatorconfig.json"
+const configFileName = ".gatorconfig.json"
 
 type Config struct {
 	Current_user_name string `json:"current_user_name"`
@@ -50,7 +50,7 @@ func getConfigFilePath() (string, error) {
 		return "", fmt.Errorf("could not find home directory, error: %w", err)
 	}
 
-	fullPath := filepath.Join(homeDir, configFilePath)
+	fullPath := filepath.Join(homeDir, configFileName)
 	return fullPath, nil
 }
 
