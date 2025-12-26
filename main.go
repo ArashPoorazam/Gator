@@ -11,6 +11,7 @@ import (
 func main() {
 	fmt.Println("Dont forget to build the app first then test it!!!")
 
+	// read config
 	cfg, err := config.ReadConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -18,7 +19,7 @@ func main() {
 
 	// creating state and command handler
 	State := state{&cfg}
-	commands := commands{handler: make(map[string]func(s *state, cmd command) error)}
+	commands := commands{make(map[string]func(s *state, cmd command) error)}
 
 	// commands
 	commands.register("login", handlerLogin)
