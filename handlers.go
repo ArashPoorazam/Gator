@@ -103,3 +103,34 @@ func handlerDeleteUser(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerResetTable(s *state, cmd command) error {
+	err := s.Queries.ResetTable(context.Background())
+	if err != nil {
+		return fmt.Errorf("could not reset table: %w", err)
+	}
+
+	fmt.Println("Users Table Reset!")
+
+	return nil
+}
+
+func handlerGetUsers(s *state, cmd command) error {
+	names, err := s.Queries.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("could not get users names: %w", err)
+	}
+
+	for i, name := range names {
+		if i >= 50 {
+			return nil
+		}
+		if s.Config.Current_user_name == name {
+			fmt.Printf("* %s (current)\n", name)
+			continue
+		}
+		fmt.Printf("* %s\n", name)
+	}
+
+	return nil
+}

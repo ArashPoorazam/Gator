@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Dont forget to build the app first then test it!!!")
+	// fmt.Println("Dont forget to build the app first then test it!!!")
 
 	// read config
 	cfg, err := config.ReadConfig()
@@ -36,6 +36,8 @@ func main() {
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
 	commands.register("delete", handlerDeleteUser)
+	commands.register("reset", handlerResetTable)
+	commands.register("users", handlerGetUsers)
 
 	// get args
 	argsSlice := os.Args[:]
