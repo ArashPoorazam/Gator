@@ -35,6 +35,7 @@ func main() {
 	// commands
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
+	commands.register("delete", handlerDeleteUser)
 
 	// get args
 	argsSlice := os.Args[:]

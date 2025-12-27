@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/ArashPoorazam/Gator/internal/database"
@@ -24,12 +23,17 @@ func handlerLogin(s *state, cmd command) error {
 	}
 	username = username[1:]
 
-	err := s.Config.SetUser(username)
+	user, err := s.Queries.GetUser(context.Background(), username)
+	if err != nil {
+		return fmt.Errorf("user does not exist: %w", err)
+	}
+
+	err = s.Config.SetUser(user.Name)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("User %s has been set\n", username)
+	fmt.Printf("User %s has been set\n", user.Name)
 
 	return nil
 }
@@ -57,7 +61,7 @@ func handlerRegister(s *state, cmd command) error {
 
 	_, err := s.Queries.GetUser(context.Background(), username)
 	if err == nil {
-		os.Exit(1)
+		return fmt.Errorf("user already exist: %w", err)
 	}
 
 	user, err := s.Queries.CreateUser(context.Background(), newUser)
@@ -68,6 +72,33 @@ func handlerRegister(s *state, cmd command) error {
 	err = s.Config.SetUser(user.Name)
 	if err != nil {
 		return fmt.Errorf("could not set new user: %w", err)
+	}
+
+	return nil
+}
+
+func handlerDeleteUser(s *state, cmd command) error {
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("the login handler expects a single argument, the username.")
+	}
+
+	username := ""
+	for _, arg := range cmd.Args {
+		username += " " + arg
+		if len(username) > 30 {
+			return fmt.Errorf("username is too long")
+		}
+	}
+	username = username[1:]
+
+	user, err := s.Queries.GetUser(context.Background(), username)
+	if err != nil {
+		return fmt.Errorf("user does not exist: %w", err)
+	}
+
+	err = s.Queries.DeleteUser(context.Background(), user.Name)
+	if err != nil {
+		return fmt.Errorf("could not delete user: %w", err)
 	}
 
 	return nil
