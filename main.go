@@ -1,11 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	"github.com/ArashPoorazam/Gator/internal/config"
+	"github.com/ArashPoorazam/Gator/internal/database"
 )
 
 func main() {
@@ -18,11 +22,19 @@ func main() {
 	}
 
 	// creating state and command handler
-	State := state{&cfg}
-	commands := commands{make(map[string]func(s *state, cmd command) error)}
+	query, err := newQuery(cfg.Db_url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	State := state{
+		Config:  &cfg,
+		Queries: query,
+	}
+	commands := commands{make(map[string]func(*state, command) error)}
 
 	// commands
 	commands.register("login", handlerLogin)
+	commands.register("register", handlerRegister)
 
 	// get args
 	argsSlice := os.Args[:]
@@ -30,10 +42,26 @@ func main() {
 		log.Fatal("Peogram need at least one argument")
 	}
 
-	// input command
+	// run command
 	newCommand := command{Name: argsSlice[1], Args: argsSlice[2:]}
 	err = commands.run(&State, newCommand)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func newQuery(dbLink string) (dbQueries *database.Queries, err error) {
+	db, err := sql.Open("postgres", dbLink)
+	if err != nil {
+		return nil, fmt.Errorf("connection error: %w", err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("ping error: %w", err)
+	}
+
+	dbQueries = database.New(db)
+
+	return dbQueries, nil
 }
