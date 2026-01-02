@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerLogin(s *state, cmd command) error {
+func handlerLogin(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("the login handler expects a single argument, the username.")
 	}
@@ -38,7 +38,7 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
-func handlerRegister(s *state, cmd command) error {
+func handlerRegister(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("the login handler expects a single argument, the username.")
 	}
@@ -64,12 +64,12 @@ func handlerRegister(s *state, cmd command) error {
 		return fmt.Errorf("user already exist")
 	}
 
-	user, err := s.Queries.CreateUser(context.Background(), newUser)
+	createdUser, err := s.Queries.CreateUser(context.Background(), newUser)
 	if err != nil {
 		return fmt.Errorf("could not create new user in database: %w", err)
 	}
 
-	err = s.Config.SetUser(user.Name)
+	err = s.Config.SetUser(createdUser.Name)
 	if err != nil {
 		return fmt.Errorf("could not set new user: %w", err)
 	}
@@ -77,7 +77,7 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
-func handlerGetUsers(s *state, cmd command) error {
+func handlerGetUsers(s *state, cmd command, user database.User) error {
 	names, err := s.Queries.GetUsers(context.Background())
 	if err != nil {
 		return fmt.Errorf("could not get users names: %w", err)

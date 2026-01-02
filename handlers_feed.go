@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAgg(s *state, cmd command) error {
+func handlerAgg(s *state, cmd command, user database.User) error {
 	url := "https://www.wagslane.dev/index.xml"
 
 	feed, err := rss.FetchFeed(context.Background(), url)
@@ -24,18 +24,12 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) < 2 {
 		return fmt.Errorf("the login handler expects a -Two- argument, the -name- of feed and -url-")
 	}
 
 	_, err := url.ParseRequestURI(cmd.Args[1])
-
-	user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("please register first: %w", err)
-	}
-	userID := user.ID
 
 	feedPram := database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -43,7 +37,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now().UTC(),
 		Name:      cmd.Args[0],
 		Url:       cmd.Args[1],
-		UserID:    userID,
+		UserID:    user.ID,
 	}
 
 	feed, err := s.Queries.CreateFeed(context.Background(), feedPram)
@@ -55,7 +49,7 @@ func handlerAddFeed(s *state, cmd command) error {
 	println("=======================================================")
 	printFeed(feed, user.Name)
 
-	err = funcFollowFeed(s, userID, feed.ID)
+	err = funcFollowFeed(s, user.ID, feed.ID)
 	if err != nil {
 		return err
 	}
@@ -63,7 +57,7 @@ func handlerAddFeed(s *state, cmd command) error {
 	return nil
 }
 
-func handlerGetAllFeeds(s *state, cmd command) error {
+func handlerGetAllFeeds(s *state, cmd command, user database.User) error {
 	feeds, err := s.Queries.GetAllFeeds(context.Background())
 	if err != nil {
 		return fmt.Errorf("could not catch all feeds: %w", err)

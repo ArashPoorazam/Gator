@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollowFeed(s *state, cmd command) error {
+func handlerFollowFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) < 1 {
 		return fmt.Errorf("command needs at least one input. the URL.")
 	}
@@ -17,11 +17,6 @@ func handlerFollowFeed(s *state, cmd command) error {
 	feed, err := s.Queries.GetFeed(context.Background(), cmd.Args[0])
 	if err != nil {
 		return fmt.Errorf("the feed does not exist: %w", err)
-	}
-
-	user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("you have not registered: %w", err)
 	}
 
 	err = funcFollowFeed(s, user.ID, feed.ID)
@@ -32,7 +27,7 @@ func handlerFollowFeed(s *state, cmd command) error {
 	return nil
 }
 
-func handlerUserFollows(s *state, cmd command) error {
+func handlerUserFollows(s *state, cmd command, user database.User) error {
 	user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
 	if err != nil {
 		return fmt.Errorf("please register first: %w", err)

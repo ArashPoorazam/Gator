@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/ArashPoorazam/Gator/internal/database"
 )
 
-func handlerDeleteUser(s *state, cmd command) error {
+func handlerDeleteUser(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("the login handler expects a single argument, the username.")
 	}
@@ -32,7 +34,7 @@ func handlerDeleteUser(s *state, cmd command) error {
 	return nil
 }
 
-func handlerResetTable(s *state, cmd command) error {
+func handlerResetTable(s *state, cmd command, user database.User) error {
 	err := s.Queries.ResetTable(context.Background())
 	if err != nil {
 		return fmt.Errorf("could not reset table: %w", err)

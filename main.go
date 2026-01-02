@@ -41,16 +41,16 @@ func main() {
 	commands := commands{make(map[string]func(*state, command) error)}
 
 	// add commands
-	commands.add("login", handlerLogin)
-	commands.add("register", handlerRegister)
-	commands.add("delete", handlerDeleteUser)
-	commands.add("reset", handlerResetTable)
-	commands.add("users", handlerGetUsers)
-	commands.add("agg", handlerAgg)
-	commands.add("addfeed", handlerAddFeed)
-	commands.add("feeds", handlerGetAllFeeds)
-	commands.add("follow", handlerFollowFeed)
-	commands.add("following", handlerUserFollows)
+	commands.add("login", middlewareLoggedIn(handlerLogin))
+	commands.add("register", middlewareLoggedIn(handlerRegister))
+	commands.add("delete", middlewareLoggedIn(handlerDeleteUser))
+	commands.add("reset", middlewareLoggedIn(handlerResetTable))
+	commands.add("users", middlewareLoggedIn(handlerGetUsers))
+	commands.add("agg", middlewareLoggedIn(handlerAgg))
+	commands.add("addfeed", middlewareLoggedIn(handlerAddFeed))
+	commands.add("feeds", middlewareLoggedIn(handlerGetAllFeeds))
+	commands.add("follow", middlewareLoggedIn(handlerFollowFeed))
+	commands.add("following", middlewareLoggedIn(handlerUserFollows))
 
 	// get args
 	argsSlice := os.Args[:]
