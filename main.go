@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -22,22 +21,36 @@ func main() {
 	}
 
 	// creating state and command handler
-	query, err := newQuery(cfg.Db_url)
+	db, err := sql.Open("postgres", cfg.Db_url)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("connection error: %w", err)
 	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("ping error: %w", err)
+	}
+
+	dbQueries := database.New(db)
+
 	State := state{
 		Config:  &cfg,
-		Queries: query,
+		Queries: dbQueries,
 	}
 	commands := commands{make(map[string]func(*state, command) error)}
 
-	// commands
-	commands.register("login", handlerLogin)
-	commands.register("register", handlerRegister)
-	commands.register("delete", handlerDeleteUser)
-	commands.register("reset", handlerResetTable)
-	commands.register("users", handlerGetUsers)
+	// add commands
+	commands.add("login", handlerLogin)
+	commands.add("register", handlerRegister)
+	commands.add("delete", handlerDeleteUser)
+	commands.add("reset", handlerResetTable)
+	commands.add("users", handlerGetUsers)
+	commands.add("agg", handlerAgg)
+	commands.add("addfeed", handlerAddFeed)
+	commands.add("feeds", handlerGetAllFeeds)
+	commands.add("follow", handlerFollowFeed)
+	commands.add("following", handlerUserFollows)
 
 	// get args
 	argsSlice := os.Args[:]
@@ -51,20 +64,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func newQuery(dbLink string) (dbQueries *database.Queries, err error) {
-	db, err := sql.Open("postgres", dbLink)
-	if err != nil {
-		return nil, fmt.Errorf("connection error: %w", err)
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, fmt.Errorf("ping error: %w", err)
-	}
-
-	dbQueries = database.New(db)
-
-	return dbQueries, nil
 }
