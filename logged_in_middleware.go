@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ArashPoorazam/Gator/internal/database"
 )
@@ -10,7 +11,7 @@ func middlewareLoggedIn(handler func(s *state, cmd command, user database.User) 
 	return func(s *state, cmd command) error {
 		user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
 		if err != nil {
-			return err
+			return fmt.Errorf("please register first: %w", err)
 		}
 
 		return handler(s, cmd, user)

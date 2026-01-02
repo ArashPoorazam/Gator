@@ -64,7 +64,7 @@ func handlerGetAllFeeds(s *state, cmd command, user database.User) error {
 	}
 
 	for _, feed := range feeds {
-		name, err := s.Queries.GetUserName(context.Background(), feed.UserID)
+		name, err := s.Queries.GetUserName(context.Background(), user.ID)
 		if err != nil {
 			return err
 		}

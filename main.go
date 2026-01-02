@@ -50,7 +50,8 @@ func main() {
 	commands.add("addfeed", middlewareLoggedIn(handlerAddFeed))
 	commands.add("feeds", middlewareLoggedIn(handlerGetAllFeeds))
 	commands.add("follow", middlewareLoggedIn(handlerFollowFeed))
-	commands.add("following", middlewareLoggedIn(handlerUserFollows))
+	commands.add("unfollow", middlewareLoggedIn(handlerUnfollowFeed))
+	commands.add("following", middlewareLoggedIn(handlerUserFollowings))
 
 	// get args
 	argsSlice := os.Args[:]

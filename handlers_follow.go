@@ -27,12 +27,34 @@ func handlerFollowFeed(s *state, cmd command, user database.User) error {
 	return nil
 }
 
-func handlerUserFollows(s *state, cmd command, user database.User) error {
-	user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("please register first: %w", err)
+func handlerUnfollowFeed(s *state, cmd command, user database.User) error {
+	if len(cmd.Args) < 1 {
+		return fmt.Errorf("command needs at least one input. the URL.")
 	}
 
+	feed, err := s.Queries.GetFeed(context.Background(), cmd.Args[0])
+	if err != nil {
+		return fmt.Errorf("the feed does not exist: %w", err)
+	}
+
+	unfollowParams := database.UnfollowFeedParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	}
+
+	err = s.Queries.UnfollowFeed(context.Background(), unfollowParams)
+	if err != nil {
+		return fmt.Errorf("could not unfollow this feed: %w", err)
+	}
+
+	fmt.Println("------------------------------------------")
+	fmt.Printf("User %s unfollowed %s\n", user.Name, feed.Name)
+	fmt.Println("------------------------------------------")
+
+	return nil
+}
+
+func handlerUserFollowings(s *state, cmd command, user database.User) error {
 	allFeeds, err := s.Queries.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("could not catch all feeds: %w", err)
