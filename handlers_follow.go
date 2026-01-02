@@ -24,22 +24,10 @@ func handlerFollowFeed(s *state, cmd command) error {
 		return fmt.Errorf("you have not registered: %w", err)
 	}
 
-	followFeed := database.CreateFeedFollowParams{
-		ID:        uuid.New(),
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
-		UserID:    user.ID,
-		FeedID:    feed.ID,
-	}
-
-	followed, err := s.Queries.CreateFeedFollow(context.Background(), followFeed)
+	err = funcFollowFeed(s, user.ID, feed.ID)
 	if err != nil {
-		return fmt.Errorf("could not follow this feed: %w", err)
+		return err
 	}
-
-	fmt.Println("------------------------------------------")
-	fmt.Printf("User %s followed %s\n", followed.UserName, followed.FeedName)
-	fmt.Println("------------------------------------------")
 
 	return nil
 }
@@ -61,5 +49,26 @@ func handlerUserFollows(s *state, cmd command) error {
 			return nil
 		}
 	}
+	return nil
+}
+
+func funcFollowFeed(s *state, userID uuid.UUID, feedID uuid.UUID) error {
+	followFeedParam := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    userID,
+		FeedID:    feedID,
+	}
+
+	followFeed, err := s.Queries.CreateFeedFollow(context.Background(), followFeedParam)
+	if err != nil {
+		return fmt.Errorf("could not follow this feed: %w", err)
+	}
+
+	fmt.Println("------------------------------------------")
+	fmt.Printf("User %s followed %s\n", followFeed.UserName, followFeed.FeedName)
+	fmt.Println("------------------------------------------")
+
 	return nil
 }

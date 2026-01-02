@@ -61,7 +61,7 @@ func handlerRegister(s *state, cmd command) error {
 
 	_, err := s.Queries.GetUser(context.Background(), username)
 	if err == nil {
-		return fmt.Errorf("user already exist: %w", err)
+		return fmt.Errorf("user already exist")
 	}
 
 	user, err := s.Queries.CreateUser(context.Background(), newUser)

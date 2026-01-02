@@ -16,7 +16,7 @@ func handlerAgg(s *state, cmd command) error {
 
 	feed, err := rss.FetchFeed(context.Background(), url)
 	if err != nil {
-		return err
+		return fmt.Errorf("feed does not exist, %w", err)
 	}
 
 	fmt.Printf("%+v\n", feed)
@@ -32,10 +32,10 @@ func handlerAddFeed(s *state, cmd command) error {
 	_, err := url.ParseRequestURI(cmd.Args[1])
 
 	user, err := s.Queries.GetUser(context.Background(), s.Config.Current_user_name)
-	userID := user.ID
 	if err != nil {
-		return err
+		return fmt.Errorf("please register first: %w", err)
 	}
+	userID := user.ID
 
 	feedPram := database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -51,18 +51,13 @@ func handlerAddFeed(s *state, cmd command) error {
 		return fmt.Errorf("error on creating the feed: %w", err)
 	}
 
-	name, err := s.Queries.GetUserName(context.Background(), feed.UserID)
-	if err != nil {
-		return err
-	}
-
 	fmt.Println("New Feed Created!")
 	println("=======================================================")
-	printFeed(feed, name)
+	printFeed(feed, user.Name)
 
-	err = handlerFollowFeed(s, cmd)
+	err = funcFollowFeed(s, userID, feed.ID)
 	if err != nil {
-		return fmt.Errorf("created feed but could not follow it: %w", err)
+		return err
 	}
 
 	return nil
