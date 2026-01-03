@@ -24,7 +24,7 @@ type commands struct {
 func (c *commands) run(s *state, cmd command) error {
 	f, ok := c.addedCommands[cmd.Name]
 	if !ok {
-		return errors.New("command not found")
+		return errors.New("command not found! use 'Gator help'")
 	}
 	return f(s, cmd)
 }

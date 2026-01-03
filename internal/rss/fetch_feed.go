@@ -7,6 +7,7 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"regexp"
 )
 
 func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
@@ -44,11 +45,18 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 }
 
 func cleanFeed(feed *RSSFeed) {
-	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
-	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
+	feed.Channel.Title = html.UnescapeString(stripHTML(feed.Channel.Title))
+	feed.Channel.Description = html.UnescapeString(stripHTML(feed.Channel.Description))
 
 	for i := range feed.Channel.Items {
-		feed.Channel.Items[i].Title = html.UnescapeString(feed.Channel.Items[i].Title)
-		feed.Channel.Items[i].Description = html.UnescapeString(feed.Channel.Items[i].Description)
+		item := &feed.Channel.Items[i]
+		item.Title = html.UnescapeString(stripHTML(item.Title))
+		item.Description = html.UnescapeString(stripHTML(item.Description))
 	}
+}
+
+func stripHTML(src string) string {
+	// This regex looks for anything between < and >
+	re := regexp.MustCompile("<[^>]*>")
+	return re.ReplaceAllString(src, "")
 }

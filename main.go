@@ -41,6 +41,7 @@ func main() {
 	commands := commands{make(map[string]func(*state, command) error)}
 
 	// add commands
+	commands.add("help", middlewareLoggedIn(handlerHelp))
 	commands.add("agg", middlewareLoggedIn(handlerAgg))
 	commands.add("login", middlewareLoggedIn(handlerLogin))
 	commands.add("register", middlewareLoggedIn(handlerRegister))
@@ -52,6 +53,8 @@ func main() {
 	commands.add("follow", middlewareLoggedIn(handlerFollowFeed))
 	commands.add("unfollow", middlewareLoggedIn(handlerUnfollowFeed))
 	commands.add("following", middlewareLoggedIn(handlerUserFollowings))
+	commands.add("browse", middlewareLoggedIn(handlerBrowse))
+	commands.add("clearposts", middlewareLoggedIn(handlerClearPosts))
 
 	// get args
 	argsSlice := os.Args[:]

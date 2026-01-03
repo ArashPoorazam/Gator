@@ -8,9 +8,11 @@ CREATE TABLE feed_follows (
     feed_id UUID NOT NULL,
     UNIQUE(user_id, feed_id),
     CONSTRAINT fk_user_id
-    Foreign Key (user_id) REFERENCES users(id),
+    Foreign Key (user_id) REFERENCES users(id)
+    ON DELETE CASCADE,
     CONSTRAINT fk_feed_id
     Foreign Key (feed_id) REFERENCES feeds(id)
+    ON DELETE CASCADE
 );
 -- +goose StatementEnd
 

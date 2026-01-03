@@ -1,20 +1,21 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE feeds (
+CREATE TABLE posts (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    name TEXT NOT NULL,
+    published_at TIMESTAMP NOT NULL,
+    title TEXT NOT NULL,
     url TEXT UNIQUE NOT NULL,
-    user_id UUID NOT NULL,
-    CONSTRAINT fk_user_id
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
+    description TEXT,
+    feed_id UUID NOT NULL,
+    CONSTRAINT fk_feed_id
+    Foreign Key (feed_id) REFERENCES feeds(id)
+    ON DELETE CASCADE
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE feeds;
+DROP TABLE posts;
 -- +goose StatementEnd
