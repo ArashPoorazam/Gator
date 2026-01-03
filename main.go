@@ -41,12 +41,12 @@ func main() {
 	commands := commands{make(map[string]func(*state, command) error)}
 
 	// add commands
+	commands.add("agg", middlewareLoggedIn(handlerAgg))
 	commands.add("login", middlewareLoggedIn(handlerLogin))
 	commands.add("register", middlewareLoggedIn(handlerRegister))
 	commands.add("delete", middlewareLoggedIn(handlerDeleteUser))
 	commands.add("reset", middlewareLoggedIn(handlerResetTable))
 	commands.add("users", middlewareLoggedIn(handlerGetUsers))
-	commands.add("agg", middlewareLoggedIn(handlerAgg))
 	commands.add("addfeed", middlewareLoggedIn(handlerAddFeed))
 	commands.add("feeds", middlewareLoggedIn(handlerGetAllFeeds))
 	commands.add("follow", middlewareLoggedIn(handlerFollowFeed))
