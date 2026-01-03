@@ -71,7 +71,7 @@ Create a configuration file at `~/.gatorconfig.json` in your home directory with
 
 ## commands
 
-> ⚠️ **Important:** it is not a finished project more commands will be added
+> ⚠️ **Important:** this repo is not a finished project more commands will be added
 
 ### User Management
 
